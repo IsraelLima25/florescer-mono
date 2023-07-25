@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import br.com.loja.florescer.exception.BusinessException;
 import br.com.loja.florescer.form.PedidoForm;
 import br.com.loja.florescer.model.Cliente;
 import br.com.loja.florescer.model.Entrega;
@@ -46,7 +47,7 @@ public class PedidoService {
 		
 		if(!possivelCliente.isPresent()) {
 			LOGGER.warn("Cliente com cpf {} não existe!", form.cpfCliente());
-			throw new IllegalArgumentException(String.format("Cliente com cpf {} não existe!", form.cpfCliente()));
+			throw new BusinessException(String.format("Cliente com cpf {} não existe!", form.cpfCliente()));
 		}
 		
 		pedido.adicionarCliente(possivelCliente.get());

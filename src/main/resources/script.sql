@@ -1,5 +1,5 @@
-CREATE DATABASE db_florescer;
-USE db_florescer;
+--CREATE DATABASE test_db_florescer;
+--USE test_db_florescer;
 
 CREATE TABLE tbl_endereco(
 id BIGINT AUTO_INCREMENT,
@@ -71,7 +71,6 @@ observacao TEXT NULL,
 PRIMARY KEY(id)
 );
 
-
 CREATE TABLE tbl_entrega(
 id BIGINT AUTO_INCREMENT,
 status VARCHAR(50) NOT NULL,
@@ -89,8 +88,6 @@ id_pedido BIGINT NOT NULL,
 quantidade BIGINT NOT NULL, 
 PRIMARY KEY(id)
 );
-
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ALTER TABLE tbl_cliente ADD CONSTRAINT fk_endereco_cliente	FOREIGN KEY (id_endereco) REFERENCES tbl_endereco (id);
 ALTER TABLE tbl_fornecedor ADD CONSTRAINT fk_endereco_fornecedor FOREIGN KEY (id_endereco) REFERENCES tbl_endereco (id);
@@ -132,28 +129,3 @@ INSERT tbl_entrega (status,avaliacao_estrela,preco,id_endereco) VALUES ("TRANSIT
 INSERT tbl_pagamento (data_hora_local, preco_total, forma_pagamento, status) VALUES ("2023-07-13 09:00:00", 37.90, "CREDITO", "PAGO");
 INSERT tbl_pedido (data_hora_local, preco_total,status,id_cliente,id_pagamento,id_entrega) VALUES ("2023-07-13 08:58:00", 37.90, "PROCESSANDO_PAGAMENTO",1,1,1);
 INSERT tbl_pedido_produto(id_pedido,id_produto,quantidade) VALUES (1,1,1);
-
--- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-SELECT 
-tc.nome AS NOME_CLIENTE,
-tp.preco_total AS PRECO_TOTAL_COMPRA,
-tp.observacao AS OBSERVACAO_COMPRA,
-tpag.forma_pagamento AS FORMA_PAGAMENTO, 
-te.preco AS PRECO_TOTAL_COMPRA,
-tend.uf AS ESTADO_DESTINO,
-tend.localidade AS CIDADE_DESTINO,
-tend.bairro AS BAIRRO_DESTINO,
-tprod.descricao AS NOME_PRODUTO,
-tprod.preco AS PRECO_UNITARIO_PRODUTO,
-tpp.quantidade AS QUANTIDADE
-FROM tbl_pedido tp 
-INNER JOIN tbl_cliente tc ON tp.id_cliente=tc.id
-INNER JOIN tbl_pagamento tpag ON tp.id_pagamento=tpag.id 
-INNER JOIN tbl_entrega te ON tp.id_entrega=te.id
-INNER JOIN tbl_endereco tend ON tc.id_endereco=tend.id
-INNER JOIN tbl_pedido_produto tpp ON tpp.id_pedido=tp.id 
-INNER JOIN tbl_produto tprod ON tpp.id_produto=tprod.id;
-
--- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-

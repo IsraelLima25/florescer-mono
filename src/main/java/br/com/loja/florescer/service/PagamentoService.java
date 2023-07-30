@@ -17,8 +17,7 @@ public class PagamentoService {
 	
 	public void pagar(Pedido pedido) {
 		Pagamento pagamento = pedido.getPagamento();
-		LOGGER.info("Iniciando processamento do pagamento do pedido {} ", pedido.getId());
-		pagamento.iniciarProcessamento();
+		LOGGER.info("Processando pagamento do pedido {} ", pedido.getId());
 		pagamento.processarPagamento();
 		LOGGER.info("Pagamento do pedido com id {} processado com sucesso", pedido.getId());
 		pedido.atualizarStatus(StatusPedidoIndicador.PAGAMENTO_PROCESSADO);

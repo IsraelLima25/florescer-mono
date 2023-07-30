@@ -70,29 +70,19 @@ public class Pagamento {
 		return instante;
 	}
 	
-	public void iniciarProcessamento() {
+	public void processarPagamento() {
+		
 		if (this.status == StatusPagamentoIndicador.CANCELADO) {
 			throw new BusinessException("Este pagamento já foi cancelado");
 		}
 		if (this.status == StatusPagamentoIndicador.PROCESSADO) {
 			throw new BusinessException("Este pagamento já foi processado");
 		}
-		if (this.status == StatusPagamentoIndicador.EM_PROCESSAMENTO) {
-			throw new BusinessException("Este pagamento já está em processamento");
-		}
-		
-		this.status = StatusPagamentoIndicador.EM_PROCESSAMENTO;
+		this.status = StatusPagamentoIndicador.PROCESSADO;
 	}
 	
-	public void processarPagamento() {
-		if (this.status == StatusPagamentoIndicador.CANCELADO) {
-			throw new BusinessException("Este pagamento já foi cancelado");
-		}
-		if (this.status == StatusPagamentoIndicador.PROCESSADO) {
-			throw new BusinessException("Este pagamento já foi processado");
-		}
-
-		this.status = StatusPagamentoIndicador.PROCESSADO;
+	public void alterarStatusPagamento(StatusPagamentoIndicador novoStatus) {
+		this.status = novoStatus;
 	}
 	
 }

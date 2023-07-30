@@ -71,8 +71,10 @@ public class Entrega {
 		
 		BigDecimal impostoEstadual = itens.stream().filter(itemPedido -> {
 			return itemPedido.getId().getProduto().getFilial().equals(this.endereco.getUf());
-		}).collect(Collectors.toList()).stream().map(itemPedido -> itemPedido.getId().getProduto().getPreco().multiply(new BigDecimal(itemPedido.getQuantidade()))).reduce(BigDecimal.ZERO, (i,e) -> {
-			return e.multiply(new BigDecimal("0.1"));
+		}).collect(Collectors.toList())
+				.stream().map(itemPedido -> itemPedido.getId().getProduto().getPreco().multiply(new BigDecimal(itemPedido.getQuantidade())))
+				.reduce(BigDecimal.ZERO, (subtotal, element) -> {
+			return subtotal.add(element.multiply(new BigDecimal("0.1")));
 		}).setScale(2, BigDecimal.ROUND_HALF_UP);
 		
 		return impostoEstadual;
@@ -82,8 +84,10 @@ public class Entrega {
 		
 		BigDecimal impostoInterEstadual = itens.stream().filter(itemPedido -> {
 			return !itemPedido.getId().getProduto().getFilial().equals(this.endereco.getUf());
-		}).collect(Collectors.toList()).stream().map(itemPedido -> itemPedido.getId().getProduto().getPreco().multiply(new BigDecimal(itemPedido.getQuantidade()))).reduce(BigDecimal.ZERO, (i,e) -> {
-			return e.multiply(new BigDecimal("0.2"));
+		}).collect(Collectors.toList())
+				.stream().map(itemPedido -> itemPedido.getId().getProduto().getPreco().multiply(new BigDecimal(itemPedido.getQuantidade())))
+				.reduce(BigDecimal.ZERO, (subtotal, element) -> {
+			return subtotal.add(element.multiply(new BigDecimal("0.2")));
 		}).setScale(2, BigDecimal.ROUND_HALF_UP);
 		
 		return impostoInterEstadual;

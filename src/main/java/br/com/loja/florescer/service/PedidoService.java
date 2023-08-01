@@ -76,7 +76,6 @@ public class PedidoService {
 		reservaEstoqueService.reservarEstoqueItensPedido(pedido);
 		
 		return pedido;
-
 	}
 
 	public void cancelar(Pedido pedido) {

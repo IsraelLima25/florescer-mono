@@ -1,5 +1,7 @@
 package br.com.loja.florescer.model;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -50,4 +52,26 @@ public class ReservaEstoque {
 	public Integer getQuantidade() {
 		return quantidade;
 	}
+	
+	public Long getId() {
+		return id;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ReservaEstoque other = (ReservaEstoque) obj;
+		return Objects.equals(id, other.id);
+	}
+	
 }

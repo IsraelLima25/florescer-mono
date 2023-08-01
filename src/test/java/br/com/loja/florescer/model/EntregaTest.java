@@ -90,7 +90,7 @@ public class EntregaTest {
 	}
 
 	@Test
-	void deveAvaliarEntregaNaoAvaliada() {
+	void naoDeveAvaliarEntregaAvaliada() {
 
 		Pedido pedido = new Pedido();
 		Endereco enderecoClienteInterEstadual = new Endereco("41290200", "Rua dos testes cliente", "primeiro andar",
@@ -106,9 +106,11 @@ public class EntregaTest {
 
 		entrega.avaliar(AvaliacaoIndicador.FIVE_STAR);
 
-		assertThrows(BusinessException.class, () -> {
+		BusinessException businessException = assertThrows(BusinessException.class, () -> {
 			entrega.avaliar(AvaliacaoIndicador.FIVE_STAR);
 		});
+		
+		assertEquals("Atenção!! Esta entrega já foi avaliada", businessException.getMessage());
 
 	}
 

@@ -41,6 +41,16 @@ public class Produto {
 	@Deprecated
 	public Produto() {
 	}
+	
+	public Produto(Long id, String descricao, BigDecimal preco, Integer quantidadeEstoque, String filial,
+			Fornecedor fornecedor) {
+		this.id = id;
+		this.descricao = descricao;
+		this.preco = preco;
+		this.quantidadeEstoque = quantidadeEstoque;
+		this.filial = filial;
+		this.fornecedor = fornecedor;
+	}
 
 	public Produto(String descricao, BigDecimal preco, Integer quantidadeEstoque, String filial,
 			Fornecedor fornecedor) {

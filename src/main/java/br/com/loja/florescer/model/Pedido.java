@@ -68,6 +68,14 @@ public class Pedido {
 		this.valorTotalItens = BigDecimal.ZERO;
 		this.valorTotalPagamento = BigDecimal.ZERO;
 	}
+	
+	public Pedido(Long id) {
+		this.id = id;
+		this.status = StatusPedidoIndicador.AGUARDANDO_PAGAMENTO;
+		this.instante = LocalDateTime.now();
+		this.valorTotalItens = BigDecimal.ZERO;
+		this.valorTotalPagamento = BigDecimal.ZERO;
+	}
 
 	public Cliente getCliente() {
 		return cliente;

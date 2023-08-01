@@ -2,6 +2,7 @@ package br.com.loja.florescer.model;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import br.com.loja.florescer.exception.BusinessException;
@@ -119,5 +120,24 @@ public class Entrega {
 		}
 		this.avaliacao = avaliacao;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Entrega other = (Entrega) obj;
+		return Objects.equals(id, other.id);
+	}
+	
+	
 
 }

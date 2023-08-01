@@ -2,6 +2,7 @@ package br.com.loja.florescer.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import br.com.loja.florescer.exception.BusinessException;
 import br.com.loja.florescer.indicador.StatusPagamentoIndicador;
@@ -83,6 +84,23 @@ public class Pagamento {
 	
 	public void alterarStatusPagamento(StatusPagamentoIndicador novoStatus) {
 		this.status = novoStatus;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Pagamento other = (Pagamento) obj;
+		return Objects.equals(id, other.id);
 	}
 	
 }

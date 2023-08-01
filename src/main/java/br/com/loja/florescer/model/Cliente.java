@@ -1,6 +1,7 @@
 package br.com.loja.florescer.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -81,5 +82,24 @@ public class Cliente {
 		return "Cliente [nome=" + nome + ", cpf=" + cpf + ", rg=" + rg + ", dataNascimento=" + dataNascimento
 				+ ", endereco=" + endereco + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(cpf, id, rg);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Cliente other = (Cliente) obj;
+		return Objects.equals(cpf, other.cpf) && Objects.equals(id, other.id) && Objects.equals(rg, other.rg);
+	}
+	
+	
 	
 }

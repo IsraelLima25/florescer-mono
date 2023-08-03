@@ -27,19 +27,19 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/fornecedores")
 public class FornecedorController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FornecedorController.class);
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(FornecedorController.class);
+
 	private FornecedorRepository fornecedorRespository;
 
 	private ApiEnderecoService apiEnderecoService;
-	
+
 	public FornecedorController(FornecedorRepository fornecedorRepository, ApiEnderecoService apiEnderecoService) {
 		this.fornecedorRespository = fornecedorRepository;
 		this.apiEnderecoService = apiEnderecoService;
 	}
 
 	@GetMapping
-	public ResponseEntity<List<FornecedorView>> listarTodos(){
+	public ResponseEntity<List<FornecedorView>> listarTodos() {
 		LOGGER.info("Buscando fornecedores");
 		List<Fornecedor> fornecedores = fornecedorRespository.findAll();
 		List<FornecedorView> viewFornecedores = fornecedores.stream()
@@ -48,14 +48,15 @@ public class FornecedorController {
 		LOGGER.info("Fornecedores encontrado");
 		return ResponseEntity.ok(viewFornecedores);
 	}
-	
+
 	@PostMapping
 	@Transactional
-	public ResponseEntity<FornecedorView> cadastrar(@Valid @RequestBody FornecedorForm form){
+	public ResponseEntity<FornecedorView> cadastrar(@Valid @RequestBody FornecedorForm form) {
 		LOGGER.info("Consultando endereco");
 		EnderecoView enderecoView = apiEnderecoService.requestEnderecoJSON(form.enderecoForm().cep());
 		LOGGER.info("Endereco capturado {}", enderecoView);
-		Endereco endereco = new Endereco(enderecoView.cep(), enderecoView.logradouro(), enderecoView.complemento(), enderecoView.bairro(), enderecoView.localidade(), enderecoView.uf());
+		Endereco endereco = new Endereco(enderecoView.cep(), enderecoView.logradouro(), enderecoView.complemento(),
+				enderecoView.bairro(), enderecoView.localidade(), enderecoView.uf());
 		Fornecedor fornecedor = new Fornecedor(form.nome(), form.cnpj(), endereco);
 		LOGGER.info("Cadastrando fornecedor na base de dados ...");
 		fornecedorRespository.save(fornecedor);

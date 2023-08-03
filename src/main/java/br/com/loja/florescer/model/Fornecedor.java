@@ -33,6 +33,13 @@ public class Fornecedor {
 	@Deprecated
 	public Fornecedor() {
 	}
+	
+	public Fornecedor(Long id, String nome, String cnpj, Endereco endereco) {
+		this.nome = nome;
+		this.cnpj = cnpj;
+		this.endereco = endereco;
+		this.id = id;
+	}
 
 	public Fornecedor(String nome, String cnpj, Endereco endereco) {
 		this.nome = nome;

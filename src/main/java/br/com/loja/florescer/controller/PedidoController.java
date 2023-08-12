@@ -56,7 +56,7 @@ public class PedidoController {
 	public ResponseEntity<List<PedidoView>> buscarPorCpfCliente(@PathVariable("cpf") String cpf){
 		LOGGER.info("Buscando pedido por cpf do cliente {} ", cpf);
 		Optional<List<Pedido>> possiveisPedidos = pedidoRepository.findByClienteCpf(cpf);
-		if(!possiveisPedidos.isPresent()) {
+		if(possiveisPedidos.get().size() == 0) {
 			LOGGER.warn("Atenção!! Nenhum pedido associado ao cliente de cpf {} foi encontrado!", cpf);
 			throw new NotFoundException("cpfCliente", "Nenhum pedido associado ao cpf do cliente foi encontrado!");
 		}

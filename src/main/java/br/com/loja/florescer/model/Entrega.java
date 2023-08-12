@@ -37,7 +37,8 @@ public class Entrega {
 
 	@Column(name = "preco", nullable = false)
 	private BigDecimal valor;
-
+	
+	@Enumerated(EnumType.STRING)
 	@Column(name = "avaliacao_estrela")
 	private AvaliacaoIndicador avaliacao;
 	

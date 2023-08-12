@@ -34,7 +34,7 @@ public class Produto {
 	@Column(name = "sigla_filial", nullable = false)
 	private String filial;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name = "id_fornecedor", referencedColumnName = "id", nullable = false)
 	private Fornecedor fornecedor;
 

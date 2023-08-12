@@ -25,11 +25,16 @@ import br.com.loja.florescer.model.Pagamento;
 import br.com.loja.florescer.model.Pedido;
 import br.com.loja.florescer.model.Produto;
 import br.com.loja.florescer.model.ReservaEstoque;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @ActiveProfiles("test")
 public class ReservaEstoqueRepositoryTest {
+	
+	@PersistenceContext
+	EntityManager entityManager;
 	
 	@Autowired
 	PedidoRepository pedidoRepository;
@@ -43,10 +48,15 @@ public class ReservaEstoqueRepositoryTest {
 	@Autowired
 	ReservaEstoqueRepository reservaEstoqueRepository;
 	
+	@Autowired
+	FornecedorRepository fornecedorRepository;
+	
 	Pedido pedido;
 	
 	@BeforeEach
 	void setUp() {
+		
+		resetIncrement();
 		
 		pedido = new Pedido();
 		Endereco endereco = new Endereco("41290221", "Rua dos testes endereco", "Casa", "Moca", "São Paulo",
@@ -56,11 +66,16 @@ public class ReservaEstoqueRepositoryTest {
 		Endereco enderecoFornecedor = new Endereco("41290221", "Rua dos testes fornecedor", "Casa", "Moca", "São Paulo",
 				"sp");
 		
+		Fornecedor primeiroFornecedor = new Fornecedor("Fornecedor estadual", "45331331000142", enderecoFornecedor);
+		Fornecedor segundoFornecedor = new Fornecedor("Fornecedor xyz", "78886123000169", enderecoFornecedor);
+		
+		fornecedorRepository.saveAll(List.of(primeiroFornecedor, segundoFornecedor));
+		
 		produtoRepository.saveAndFlush(new Produto("Rosa", new BigDecimal("30.00"), 30, "sp",
-				new Fornecedor("Fornecedor estadual", "45331331000142", enderecoFornecedor)));
+				primeiroFornecedor));
 		
 		produtoRepository.saveAndFlush(new Produto("Margarida", new BigDecimal("15.00"), 30, "sp",
-				new Fornecedor("Fornecedor estadual", "78886123000169", enderecoFornecedor)));
+				segundoFornecedor));
 		
 		pedido.adicionarFormaPagamento(new Pagamento(TipoFormaPagamentoIndicador.PIX, 
 				pedido.getValorTotalPagamento()));
@@ -107,5 +122,10 @@ public class ReservaEstoqueRepositoryTest {
 		List<ReservaEstoque> reservas = reservaEstoqueRepository.findByPedidoId(pedido.getId());
 		
 		assertTrue(reservas.size() == 0);
+	}
+	
+	private void resetIncrement() {
+		entityManager.createNativeQuery("ALTER TABLE db_test_florescer.tbl_produto AUTO_INCREMENT = 1")
+	    .executeUpdate(); 
 	}
 }

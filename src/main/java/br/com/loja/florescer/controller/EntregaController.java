@@ -19,6 +19,7 @@ import br.com.loja.florescer.model.Entrega;
 import br.com.loja.florescer.model.Pedido;
 import br.com.loja.florescer.repository.PedidoRepository;
 import br.com.loja.florescer.view.EntregaView;
+import br.com.loja.florescer.view.StatusEntregaView;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -35,7 +36,7 @@ public class EntregaController {
 	}
 
 	@GetMapping("/pedido/{idPedido}")
-	public ResponseEntity<StatusEntregaIndicador> statusEntrega(@PathVariable("idPedido") Long idPedido){
+	public ResponseEntity<StatusEntregaView> statusEntrega(@PathVariable("idPedido") Long idPedido){
 		LOGGER.info("Buscando pedido para checar status da entrega");
 		Optional<Pedido> possivelPedido = pedidoRepository.findById(idPedido);
 		if(!possivelPedido.isPresent()) {
@@ -45,7 +46,7 @@ public class EntregaController {
 		StatusEntregaIndicador statusAtual = possivelPedido.get().getEntrega().getStatus();
 		LOGGER.info("Pedido encontrado! E status da entrega: {}", statusAtual);
 		
-		return ResponseEntity.ok(statusAtual);
+		return ResponseEntity.ok(new StatusEntregaView(statusAtual));
 	}	
 	
 	@PostMapping("/avaliar")

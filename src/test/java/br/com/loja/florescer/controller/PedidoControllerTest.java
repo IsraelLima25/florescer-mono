@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -128,7 +129,7 @@ public class PedidoControllerTest {
 	@Test
 	void naoDeveBuscarPedidoPorCpfClienteInvalidoRetornar404() throws Exception {
 		
-		Mockito.when(pedidoRepository.findByClienteCpf("05489745693")).thenReturn(Optional.of(List.of(pedido)));
+		Mockito.when(pedidoRepository.findByClienteCpf("05489400300")).thenReturn(Optional.of(List.of()));
 		
 		mockMvc.perform(get("/api/pedidos/cliente/{cpf}","05489400300").contentType(MediaType.APPLICATION_JSON))
 		.andDo(print())

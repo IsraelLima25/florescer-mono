@@ -46,6 +46,10 @@ public class Fornecedor {
 		this.cnpj = cnpj;
 		this.endereco = endereco;
 	}
+	
+	public Long getId() {
+		return id;
+	}
 
 	public String getNome() {
 		return nome;

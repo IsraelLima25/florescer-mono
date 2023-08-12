@@ -88,7 +88,7 @@ public class EntregaControllerTest {
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
 
 		mockMvc.perform(get("/api/entregas/pedido/{idPedido}", 1L).contentType(MediaType.APPLICATION_JSON)).andDo(print())
-				.andExpect(jsonPath("$", is(StatusEntregaIndicador.AGUARDANDO_CONFIRMACAO_DE_PAGAMENTO.toString())))
+				.andExpect(jsonPath("$.status", is(StatusEntregaIndicador.AGUARDANDO_CONFIRMACAO_DE_PAGAMENTO.toString())))
 				.andExpect(status().isOk());
 	}
 

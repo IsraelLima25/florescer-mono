@@ -2,6 +2,9 @@ package br.com.loja.florescer.repository;
 
 import br.com.loja.florescer.model.Pedido;
 import br.com.loja.florescer.model.Produto;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @ActiveProfiles("test")
 public class PedidoRepositoryTest {
+
+	@PersistenceContext
+	EntityManager entityManager;
 	
 	@Autowired
 	PedidoRepository pedidoRepository;
@@ -40,9 +46,14 @@ public class PedidoRepositoryTest {
 	@Autowired
 	ProdutoRepository produtoRepository;
 	
+	@Autowired
+	FornecedorRepository fornecedorRepository;
+	
 	@BeforeEach
 	void setUp() {
 		
+		resetIncrement();
+
 		Pedido pedido = new Pedido();
 		Endereco endereco = new Endereco("41290221", "Rua dos testes endereco", "Casa", "Moca", "São Paulo",
 				"sp");
@@ -51,11 +62,16 @@ public class PedidoRepositoryTest {
 		Endereco enderecoFornecedor = new Endereco("41290221", "Rua dos testes fornecedor", "Casa", "Moca", "São Paulo",
 				"sp");
 		
+		Fornecedor primeiroFornecedor = new Fornecedor("Fornecedor estadual", "45331331000142", enderecoFornecedor);
+		Fornecedor segundoFornecedor = new Fornecedor("Fornecedor xyz ", "78886123000169", enderecoFornecedor);
+		
+		fornecedorRepository.saveAll(List.of(primeiroFornecedor, segundoFornecedor));
+		
 		produtoRepository.saveAndFlush(new Produto("Rosa", new BigDecimal("30.00"), 30, "sp",
-				new Fornecedor("Fornecedor estadual", "45331331000142", enderecoFornecedor)));
+				primeiroFornecedor));
 		
 		produtoRepository.saveAndFlush(new Produto("Margarida", new BigDecimal("15.00"), 25, "sp",
-				new Fornecedor("Fornecedor estadual", "78886123000169", enderecoFornecedor)));
+				segundoFornecedor));
 		
 		pedido.adicionarFormaPagamento(new Pagamento(TipoFormaPagamentoIndicador.PIX, 
 				pedido.getValorTotalPagamento()));
@@ -93,5 +109,10 @@ public class PedidoRepositoryTest {
 		Optional<List<Pedido>> possivelPedido = pedidoRepository.findByClienteCpf("76867395031");
 
 		assertTrue(possivelPedido.get().isEmpty());
+	}
+	
+	private void resetIncrement() {
+		entityManager.createNativeQuery("ALTER TABLE db_test_florescer.tbl_produto AUTO_INCREMENT = 1")
+	    .executeUpdate(); 
 	}
 }

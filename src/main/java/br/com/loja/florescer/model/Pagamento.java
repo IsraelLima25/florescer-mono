@@ -51,6 +51,10 @@ public class Pagamento {
 		this.instante = LocalDateTime.now();
 	}
 	
+	public Long getId() {
+		return id;
+	}
+	
 	public TipoFormaPagamentoIndicador getTipoPagamento() {
 		return tipoPagamento;
 	}

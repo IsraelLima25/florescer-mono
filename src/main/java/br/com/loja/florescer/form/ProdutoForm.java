@@ -6,4 +6,4 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record ProdutoForm(@NotBlank String descricao, @Positive @NotNull BigDecimal preco, @Positive @NotNull Integer quantidadeEstoque, @NotBlank String filial, @Positive @NotNull Long idFornecedor) { }
+public record ProdutoForm(@NotBlank String descricao, @Positive @NotNull BigDecimal preco, @Positive @NotNull int quantidadeEstoque, @NotBlank String filial, @Positive @NotNull long idFornecedor) { }

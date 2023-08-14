@@ -15,7 +15,7 @@ public class Endereco {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 	
 	@Column(name="cep", nullable = false)
 	private String cep;
@@ -49,7 +49,7 @@ public class Endereco {
 		this.uf = uf;
 	}
 
-	public Endereco(Long id, String cep, String logradouro, String complemento, String bairro, String localidade, String uf) {
+	public Endereco(long id, String cep, String logradouro, String complemento, String bairro, String localidade, String uf) {
 		this.id = id;
 		this.cep = cep;
 		this.logradouro = logradouro;
@@ -65,7 +65,7 @@ public class Endereco {
 				+ bairro + ", localidade=" + localidade + ", uf=" + uf + "]";
 	}
 	
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 	

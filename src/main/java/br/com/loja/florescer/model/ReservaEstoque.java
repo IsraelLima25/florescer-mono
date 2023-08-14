@@ -17,7 +17,7 @@ public class ReservaEstoque {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 	
 	@ManyToOne
 	@JoinColumn(name = "id_pedido", referencedColumnName = "id", nullable = false)
@@ -28,14 +28,14 @@ public class ReservaEstoque {
 	private Produto produto;
 	
 	@Column(name = "quantidade", nullable = false)
-	private Integer quantidade;
+	private int quantidade;
 	
 	@Deprecated
 	public ReservaEstoque() {
 		
 	}
 
-	public ReservaEstoque(Pedido pedido, Produto produto, Integer quantidade) {
+	public ReservaEstoque(Pedido pedido, Produto produto, int quantidade) {
 		this.pedido = pedido;
 		this.produto = produto;
 		this.quantidade = quantidade;
@@ -49,11 +49,11 @@ public class ReservaEstoque {
 		return produto;
 	}
 	
-	public Integer getQuantidade() {
+	public int getQuantidade() {
 		return quantidade;
 	}
 	
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 	

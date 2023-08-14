@@ -22,7 +22,7 @@ public class Pagamento {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "forma_pagamento", nullable = false)
@@ -51,7 +51,7 @@ public class Pagamento {
 		this.instante = LocalDateTime.now();
 	}
 	
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 	

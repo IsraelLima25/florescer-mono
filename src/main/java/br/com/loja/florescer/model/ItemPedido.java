@@ -21,13 +21,13 @@ public class ItemPedido implements Serializable {
 	private ItemPedidoPK id = new ItemPedidoPK();
 	
 	@Column(name = "quantidade", nullable = false)
-    private Integer quantidade;
+    private int quantidade;
 	
 	@Deprecated
 	public ItemPedido() {
 	}
 
-	public ItemPedido(Produto produto, Pedido pedido, Integer quantidade) {
+	public ItemPedido(Produto produto, Pedido pedido, int quantidade) {
 		id.setPedido(pedido);
 		id.setProduto(produto);
 		this.quantidade = quantidade;
@@ -37,7 +37,7 @@ public class ItemPedido implements Serializable {
 		return id;
 	}
 	
-	public Integer getQuantidade() {
+	public int getQuantidade() {
 		return quantidade;
 	}
 

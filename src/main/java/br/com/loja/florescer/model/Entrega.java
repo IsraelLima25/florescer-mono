@@ -26,7 +26,7 @@ public class Entrega {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "id_endereco", referencedColumnName = "id", nullable = false)
@@ -95,7 +95,7 @@ public class Entrega {
 		return impostoInterEstadual;
 	}
 	
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 

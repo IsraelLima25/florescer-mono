@@ -31,7 +31,7 @@ public class ReservaEstoqueService {
 		
 		LOGGER.info("Iniciando reserva de estoque para o pedido {} ", pedido.getId());
 		pedido.getItens().stream().forEach(itemPedido -> {
-			Integer quantidadeEstoque = produtoRepository.findById(itemPedido.getId().getProduto().getId()).get().getQuantidadeEstoque();
+			int quantidadeEstoque = produtoRepository.findById(itemPedido.getId().getProduto().getId()).get().getQuantidadeEstoque();
 			if(itemPedido.getQuantidade() > quantidadeEstoque) {
 				LOGGER.error("Atenção!! Pedido recusado. A quantidade do produto {} no estoque é {} e a quantidade pedida é de {}", 
 						itemPedido.getId().getProduto().getDescricao(), 

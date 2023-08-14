@@ -20,7 +20,7 @@ public class Produto {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 
 	@Column(name = "descricao", nullable = false)
 	private String descricao;
@@ -29,7 +29,7 @@ public class Produto {
 	private BigDecimal preco;
 
 	@Column(name = "quantidade_estoque", nullable = false)
-	private Integer quantidadeEstoque;
+	private int quantidadeEstoque;
 
 	@Column(name = "sigla_filial", nullable = false)
 	private String filial;
@@ -42,7 +42,7 @@ public class Produto {
 	public Produto() {
 	}
 	
-	public Produto(Long id, String descricao, BigDecimal preco, Integer quantidadeEstoque, String filial,
+	public Produto(long id, String descricao, BigDecimal preco, int quantidadeEstoque, String filial,
 			Fornecedor fornecedor) {
 		this.id = id;
 		this.descricao = descricao;
@@ -52,7 +52,7 @@ public class Produto {
 		this.fornecedor = fornecedor;
 	}
 
-	public Produto(String descricao, BigDecimal preco, Integer quantidadeEstoque, String filial,
+	public Produto(String descricao, BigDecimal preco, int quantidadeEstoque, String filial,
 			Fornecedor fornecedor) {
 		this.descricao = descricao;
 		this.preco = preco;
@@ -61,7 +61,7 @@ public class Produto {
 		this.fornecedor = fornecedor;
 	}
 	
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -73,7 +73,7 @@ public class Produto {
 		return preco;
 	}
 
-	public Integer getQuantidadeEstoque() {
+	public int getQuantidadeEstoque() {
 		return quantidadeEstoque;
 	}
 
@@ -85,14 +85,14 @@ public class Produto {
 		return fornecedor;
 	}
 	
-	public void abater(Integer quantidade) {
+	public void abater(int quantidade) {
 		if(quantidade <= 0) {
 			throw new BusinessException("Quantidade de abatimento inválida");
 		}
 		this.quantidadeEstoque-=quantidade;
 	}
 	
-	public void devolver(Integer quantidade) {
+	public void devolver(int quantidade) {
 		if(quantidade <= 0) {
 			throw new BusinessException("Quantidade de devolução inválida");
 		}

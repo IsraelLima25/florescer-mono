@@ -29,7 +29,7 @@ public class Pedido {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
@@ -69,7 +69,7 @@ public class Pedido {
 		this.valorTotalPagamento = BigDecimal.ZERO;
 	}
 	
-	public Pedido(Long id) {
+	public Pedido(long id) {
 		this.id = id;
 		this.status = StatusPedidoIndicador.AGUARDANDO_PAGAMENTO;
 		this.instante = LocalDateTime.now();
@@ -93,7 +93,7 @@ public class Pedido {
 		return entrega;
 	}
 
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 

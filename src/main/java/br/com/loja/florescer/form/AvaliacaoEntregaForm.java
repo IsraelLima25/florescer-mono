@@ -5,4 +5,4 @@ import io.micrometer.common.lang.NonNull;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record AvaliacaoEntregaForm(@NonNull @Positive Long idPedido, @NotNull AvaliacaoIndicador avaliacao) { }
+public record AvaliacaoEntregaForm(@NonNull @Positive long idPedido, @NotNull AvaliacaoIndicador avaliacao) { }

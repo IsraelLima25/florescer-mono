@@ -72,7 +72,7 @@ public class PedidoController {
 	
 	@PostMapping("/cancelar/{idPedido}")
 	@Transactional
-	public ResponseEntity<Void> cancelar(@PathVariable("idPedido") Long idPedido){
+	public ResponseEntity<Void> cancelar(@PathVariable("idPedido") long idPedido){
 		Optional<Pedido> possivelPedido = pedidoRepository.findById(idPedido);
 		if(!possivelPedido.isPresent()) {
 			LOGGER.warn("Pedido com id {}, não existe!!", idPedido);

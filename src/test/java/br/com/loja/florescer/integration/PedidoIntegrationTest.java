@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +41,9 @@ import br.com.loja.florescer.model.Fornecedor;
 import br.com.loja.florescer.model.ItemPedido;
 import br.com.loja.florescer.model.Pagamento;
 import br.com.loja.florescer.model.Pedido;
+import br.com.loja.florescer.model.Perfil;
 import br.com.loja.florescer.model.Produto;
+import br.com.loja.florescer.model.Usuario;
 import br.com.loja.florescer.repository.ClienteRepository;
 import br.com.loja.florescer.repository.EntregaRepository;
 import br.com.loja.florescer.repository.FornecedorRepository;
@@ -48,6 +51,8 @@ import br.com.loja.florescer.repository.ItemPedidoRepository;
 import br.com.loja.florescer.repository.PedidoRepository;
 import br.com.loja.florescer.repository.ProdutoRepository;
 import br.com.loja.florescer.repository.ReservaEstoqueRepository;
+import br.com.loja.florescer.repository.UsuarioRepository;
+import br.com.loja.florescer.security.LoginService;
 import br.com.loja.florescer.view.PedidoView;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -94,6 +99,21 @@ public class PedidoIntegrationTest {
 	@Autowired
 	ReservaEstoqueRepository reservaEstoqueRepository;
 	
+	@Autowired
+	UsuarioRepository usuarioRepository;
+	
+	@Value("${user.login}")
+	String login;
+	
+	@Value("${user.password.criptografada}")
+	String senhaCriptografada;
+	
+	@Value("${user.password.descriptografada}")
+	String senhaDescriptografada;
+	
+	@Autowired
+	LoginService loginService;
+	
 	private static HttpHeaders headers;
 	
 	@BeforeAll
@@ -106,6 +126,7 @@ public class PedidoIntegrationTest {
 	void init() {
 		resetIncrement();
 		TestTransaction.flagForCommit(); // need this, otherwise the next line does a rollback
+		usuarioRepository.deleteAll();
 		reservaEstoqueRepository.deleteAll();
 		itemPedidoRepository.deleteAll();
 		pedidoRepository.deleteAll();
@@ -159,6 +180,11 @@ public class PedidoIntegrationTest {
 		pedido.adicionarFormaPagamento(pagamento);
 
 		pedidoRepository.save(pedido);
+		
+		Usuario usuario = new Usuario(login, senhaCriptografada);
+		Perfil perfilADM = new Perfil("ROLE_ADMIN");
+		usuario.adicionarPerfil(perfilADM);
+		usuarioRepository.save(usuario);
 		TestTransaction.end();
 
 	}
@@ -168,6 +194,7 @@ public class PedidoIntegrationTest {
 		
 		TestTransaction.start();
 		TestTransaction.flagForCommit();
+		usuarioRepository.deleteAll();
 		reservaEstoqueRepository.deleteAll();
 		itemPedidoRepository.deleteAll();
 		pedidoRepository.deleteAll();
@@ -178,6 +205,10 @@ public class PedidoIntegrationTest {
 		
 		TestTransaction.end();
 	}
+	
+	private String getHost() {
+		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api").toUriString();
+	}
 
 	private String getURI() {
 		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/pedidos").toUriString();
@@ -185,6 +216,9 @@ public class PedidoIntegrationTest {
 	
 	@Test
 	void deveFazerPedido() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		PedidoForm form = new PedidoForm("12365489763", new EnderecoForm("41290200"),
 				TipoFormaPagamentoIndicador.AVISTA, List.of(new PedidoProdutoForm(1L, 1),new PedidoProdutoForm(2L, 2)),
@@ -205,7 +239,10 @@ public class PedidoIntegrationTest {
 	}
 	
 	@Test
-	void deveBuscarPedidoPorCpfClienteDonoPedido() { 
+	void deveBuscarPedidoPorCpfClienteDonoPedido() throws JsonProcessingException { 
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<List<PedidoView>> response = testRestTemplate.exchange(getURI().concat("/cliente/12365489763"), 
@@ -224,7 +261,10 @@ public class PedidoIntegrationTest {
 	}
 	
 	@Test
-	void naoDeveBuscarPedidoPorCpfClienteDonoPedidoInvalido() { 
+	void naoDeveBuscarPedidoPorCpfClienteDonoPedidoInvalido() throws JsonProcessingException { 
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<Object> response = testRestTemplate.exchange(getURI().concat("/cliente/12365489764"), 
@@ -236,7 +276,10 @@ public class PedidoIntegrationTest {
 	}
 	
 	@Test
-	void deveCancelarPedido() { 
+	void deveCancelarPedido() throws JsonProcessingException { 
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		ResponseEntity<Object> response = testRestTemplate.exchange(getURI().concat("/cancelar/1"), HttpMethod.POST, entity,
@@ -246,7 +289,10 @@ public class PedidoIntegrationTest {
 	}
 	
 	@Test
-	void naoDeveCancelarPedidoInvalido() {
+	void naoDeveCancelarPedidoInvalido() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<Object> response = testRestTemplate.exchange(getURI().concat("/cancelar/50"), 

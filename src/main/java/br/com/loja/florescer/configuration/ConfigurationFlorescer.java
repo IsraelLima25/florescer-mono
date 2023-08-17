@@ -9,8 +9,15 @@ public class ConfigurationFlorescer {
 	@Value("${url.via.cep}")
 	private String urlViaCep;
 	
+	@Value("${secret.token.jwt}")
+	private String secretTokenJWT;
+	
 	public String getUrlViaCep() {
 		return urlViaCep;
+	}
+	
+	public String getSecretTokenJWT() {
+		return secretTokenJWT;
 	}
 	
 }

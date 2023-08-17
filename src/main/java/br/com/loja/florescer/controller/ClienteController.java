@@ -25,10 +25,12 @@ import br.com.loja.florescer.service.ClienteService;
 import br.com.loja.florescer.util.ClienteConverter;
 import br.com.loja.florescer.view.ClienteView;
 import br.com.loja.florescer.view.EnderecoView;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/clientes")
+@SecurityRequirement(name = "bearer-key")
 public class ClienteController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClienteController.class);

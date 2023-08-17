@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,10 +32,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.loja.florescer.view.ClienteView;
 import br.com.loja.florescer.form.EnderecoForm;
 import br.com.loja.florescer.form.ClienteForm;
+import br.com.loja.florescer.model.Usuario;
 import br.com.loja.florescer.model.Cliente;
 import br.com.loja.florescer.model.Endereco;
+import br.com.loja.florescer.model.Perfil;
 import br.com.loja.florescer.repository.ClienteRepository;
-
+import br.com.loja.florescer.repository.UsuarioRepository;
+import br.com.loja.florescer.security.LoginService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -62,10 +66,26 @@ public class ClienteIntegrationTest {
 	@Autowired
 	ClienteRepository clienteRepository;
 	
-	private static HttpHeaders headers;
+	@Autowired
+	UsuarioRepository usuarioRepository;
+	
+	static HttpHeaders headers;
+	
+	@Value("${user.login}")
+	String login;
+	
+	@Value("${user.password.criptografada}")
+	String senhaCriptografada;
+	
+	@Value("${user.password.descriptografada}")
+	String senhaDescriptografada;
+	
+	@Autowired
+	LoginService loginService;
 	
 	@BeforeAll
-	static void setup() {
+	static void setup() throws JsonProcessingException {
+		
 		headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 	}
@@ -76,6 +96,13 @@ public class ClienteIntegrationTest {
 	
 		resetIncrement();
 		TestTransaction.flagForCommit();
+		usuarioRepository.deleteAll();
+		
+		Usuario usuario = new Usuario(login, senhaCriptografada);
+		Perfil perfilADM = new Perfil("ROLE_ADMIN");
+		usuario.adicionarPerfil(perfilADM);
+		
+		usuarioRepository.save(usuario);
 		
 		Cliente primeiroCliente = new Cliente("Luan Carlos", "12365489763", "2565478937", LocalDate.of(1980, 3, 5),
 				new Endereco("15945970", "Rua Guia Lopes 225", "CASA", "Centro", "Agulha", "SP"));
@@ -93,7 +120,12 @@ public class ClienteIntegrationTest {
 		TestTransaction.start();
 		TestTransaction.flagForCommit();
 		clienteRepository.deleteAll();
+		usuarioRepository.deleteAll();
 		TestTransaction.end();
+	}
+	
+	private String getHost() {
+		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api").toUriString();
 	}
 	
 	private String getURI() {
@@ -101,7 +133,10 @@ public class ClienteIntegrationTest {
 	}
 	
 	@Test
-	void deveListarTodosClientes() { 
+	void deveListarTodosClientes() throws JsonProcessingException { 
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<List<ClienteView>> response = testRestTemplate.exchange(getURI(), 
@@ -119,7 +154,10 @@ public class ClienteIntegrationTest {
 	}
 	
 	@Test
-	void deveBuscarClientePorCpf() { 
+	void deveBuscarClientePorCpf() throws JsonProcessingException { 
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<ClienteView> response = testRestTemplate.exchange(getURI().concat("/12365489763"), 
@@ -136,14 +174,16 @@ public class ClienteIntegrationTest {
 	}
 	
 	@Test
-	void naoDeveBuscarClientePorCpfInvalido() {
+	void naoDeveBuscarClientePorCpfInvalido() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<ClienteView> response = testRestTemplate.exchange(getURI().concat("/12365482063"), 
 				HttpMethod.GET, entity,
 				new ParameterizedTypeReference<ClienteView>() {
 				});
-		ClienteView body = response.getBody();
 		Integer statusCode = response.getStatusCode().value();
 
 		assertTrue(response != null);
@@ -152,6 +192,9 @@ public class ClienteIntegrationTest {
 	
 	@Test
 	void deveCadastrarCliente() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		ClienteForm form = new ClienteForm("Roberto Costa", "23654827863", "1456988712",LocalDate.of(1990, 2, 13), 
 				new EnderecoForm("41290200"));
@@ -173,6 +216,9 @@ public class ClienteIntegrationTest {
 	@Test
 	void deveAtualizarClienteValido() throws JsonProcessingException { 
 		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
+		
 		ClienteForm form = new ClienteForm("Roberto Costa", "23654827863", "1456988712",LocalDate.of(1990, 2, 13), 
 				new EnderecoForm("41290200"));
 		
@@ -192,6 +238,9 @@ public class ClienteIntegrationTest {
 	
 	@Test
 	void naoDeveAtualizarClienteInvalido() throws JsonProcessingException { 
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		ClienteForm form = new ClienteForm("Roberto Costa", "23654827863", "1456988712",LocalDate.of(1990, 2, 13), 
 				new EnderecoForm("41290200"));

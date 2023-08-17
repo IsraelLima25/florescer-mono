@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -59,6 +61,7 @@ public class FornecedorControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void deveListarTodosRetornar200() throws Exception {
 		
 		Mockito.when(fornecedorRespository.findAll()).thenReturn(fornecedores);
@@ -71,13 +74,14 @@ public class FornecedorControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void deveCadastrarRetornar200() throws Exception {
 		
 		Mockito.when(apiEnderecoService.requestEnderecoJSON("24210395")).thenReturn(new EnderecoView("68908122", "Rua dos testes cliente", "primeiro andar", "Moca",
 				"São Paulo", "sp"));
 		
 		FornecedorForm form = new FornecedorForm("Fornecedor campo largo", "04265112000125", new EnderecoForm("24210395"));
-		mockMvc.perform(post("/api/fornecedores").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/fornecedores").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(form))).andDo(print())
 				.andExpect(jsonPath("$.nome", is("Fornecedor campo largo")))
 				.andExpect(jsonPath("$.cnpj", is("04265112000125")))

@@ -22,10 +22,12 @@ import br.com.loja.florescer.repository.PedidoRepository;
 import br.com.loja.florescer.service.PedidoService;
 import br.com.loja.florescer.util.PedidoConverter;
 import br.com.loja.florescer.view.PedidoView;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/pedidos")
+@SecurityRequirement(name = "bearer-key")
 public class PedidoController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PedidoController.class);

@@ -1,5 +1,6 @@
 package br.com.loja.florescer.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -79,20 +81,22 @@ public class PagamentoControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void devePagarPedidoRetornar200() throws Exception {
 
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
 
-		mockMvc.perform(post("/api/pagamentos/pagar/{idPedido}", 1L).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(post("/api/pagamentos/pagar/{idPedido}", 1L).with(csrf()).contentType(MediaType.APPLICATION_JSON))
 				.andDo(print()).andExpect(status().isOk());
 
 	}
 
 	@Test
+	@WithMockUser
 	void naoPagarPedidoInvalidoRetornar404() throws Exception {
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
 
-		mockMvc.perform(post("/api/pagamentos/pagar/{idPedido}", 2L).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(post("/api/pagamentos/pagar/{idPedido}", 2L).with(csrf()).contentType(MediaType.APPLICATION_JSON))
 				.andDo(print()).andExpect(status().isNotFound());
 	}
 }

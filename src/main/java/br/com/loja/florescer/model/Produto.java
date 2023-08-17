@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import br.com.loja.florescer.exception.BusinessException;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

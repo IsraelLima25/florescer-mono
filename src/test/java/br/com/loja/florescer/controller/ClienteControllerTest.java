@@ -1,6 +1,7 @@
 package br.com.loja.florescer.controller;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -27,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -63,10 +65,10 @@ public class ClienteControllerTest {
 	ClienteService clienteService;
 
 	List<Cliente> clientes = new ArrayList<>();
-
+	
 	@BeforeEach
 	void setup() {
-
+		
 		clientes.addAll(List.of(
 				new Cliente("Israel Filho", "05489745693", "1565478421", LocalDate.of(1991, 3, 20),
 						new Endereco("41290200", "Rua dos testes cliente", "primeiro andar", "Moca", "São Paulo",
@@ -76,6 +78,7 @@ public class ClienteControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void deveListarTodosClientesRetornarStatus200() throws Exception {
 		
 		Mockito.when(clienteRepository.findAll()).thenReturn(clientes);
@@ -88,6 +91,7 @@ public class ClienteControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void deveBuscarClientePorCpfRetornarStatus200() throws Exception {
 		
 		Mockito.when(clienteService.buscarClientePorCpf("05489745693")).thenReturn(Optional.of(clientes.get(0)));
@@ -99,6 +103,7 @@ public class ClienteControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void naoDeveRetornarClienteCpfInvalidoRetornarStatus404() throws Exception {
 		
 		Mockito.when(clienteService.buscarClientePorCpf("05489745693")).thenReturn(Optional.of(clientes.get(0)));
@@ -108,8 +113,9 @@ public class ClienteControllerTest {
 				.andExpect(jsonPath("$").doesNotExist())
 				.andExpect(status().isNotFound());
 	}
-	
+
 	@Test
+	@WithMockUser
 	void deveCadastrarClienteRetornarStatus200() throws Exception {
 		
 		EnderecoView viewEndereco = new EnderecoView("45693654", "Rua dos testes cliente", "primeiro andar", "Moca",
@@ -119,7 +125,7 @@ public class ClienteControllerTest {
 		ClienteForm clienteForm = new ClienteForm("Lewis Norton", "04563214520","1565478300", 
 				LocalDate.of(1989, 4, 10), new EnderecoForm("41654789"));
 		
-		mockMvc.perform(post("/api/clientes").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/clientes").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(clienteForm)))
 		.andDo(print())
 		.andExpect(jsonPath("$.cpf", is("04563214520")))
@@ -129,6 +135,7 @@ public class ClienteControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void deveAtualizarClienteRetornarStatus200() throws Exception {
 		
 		EnderecoView viewEndereco = new EnderecoView("41654789", "Rua dos testes cliente", "primeiro andar", "Moca",
@@ -140,7 +147,7 @@ public class ClienteControllerTest {
 		ClienteForm clienteForm = new ClienteForm("Lewis Norton", "04563214520","1565478300", 
 				LocalDate.of(1989, 4, 10), new EnderecoForm("41654789"));
 		
-		mockMvc.perform(put("/api/clientes/{cpf}", "05489745693").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(put("/api/clientes/{cpf}", "05489745693").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(clienteForm)))
 		.andDo(print())
 		.andExpect(jsonPath("$.nome", is("Lewis Norton")))
@@ -151,6 +158,7 @@ public class ClienteControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void naoDeveAtualizarClienteRetornarStatus404() throws Exception {
 		
 		EnderecoView viewEndereco = new EnderecoView("41654789", "Rua dos testes cliente", "primeiro andar", "Moca",
@@ -162,7 +170,7 @@ public class ClienteControllerTest {
 		ClienteForm clienteForm = new ClienteForm("Lewis Norton", "04563214520","1565478300", 
 				LocalDate.of(1989, 4, 10), new EnderecoForm("41654789"));
 		
-		mockMvc.perform(put("/api/clientes/{cpf}", "12365412389").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(put("/api/clientes/{cpf}", "12365412389").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(clienteForm)))
 		.andDo(print())
 		.andExpect(jsonPath("$").doesNotExist())

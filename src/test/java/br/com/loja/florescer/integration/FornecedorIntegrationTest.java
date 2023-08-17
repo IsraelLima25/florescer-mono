@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +25,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,11 @@ import br.com.loja.florescer.form.EnderecoForm;
 import br.com.loja.florescer.form.FornecedorForm;
 import br.com.loja.florescer.model.Endereco;
 import br.com.loja.florescer.model.Fornecedor;
+import br.com.loja.florescer.model.Perfil;
+import br.com.loja.florescer.model.Usuario;
 import br.com.loja.florescer.repository.FornecedorRepository;
+import br.com.loja.florescer.repository.UsuarioRepository;
+import br.com.loja.florescer.security.LoginService;
 import br.com.loja.florescer.view.FornecedorView;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -50,16 +54,31 @@ public class FornecedorIntegrationTest {
 	int port;
 
 	@Autowired
-	private TestRestTemplate testRestTemplate;
+	TestRestTemplate testRestTemplate;
 
 	@Autowired
 	ObjectMapper objectMapper;
 
 	@Autowired
 	FornecedorRepository fornecedorRepository;
+	
+	@Autowired
+	UsuarioRepository usuarioRepository;
 
+	@Autowired
+	LoginService loginService;
+	
+	@Value("${user.login}")
+	String login;
+	
+	@Value("${user.password.criptografada}")
+	String senhaCriptografada;
+	
+	@Value("${user.password.descriptografada}")
+	String senhaDescriptografada;
+	
 	private static HttpHeaders headers;
-
+	
 	@BeforeAll
 	static void setup() {
 		headers = new HttpHeaders();
@@ -70,10 +89,17 @@ public class FornecedorIntegrationTest {
 	void init() {
 
 		TestTransaction.flagForCommit(); // need this, otherwise the next line does a rollback
+		usuarioRepository.deleteAll();
 		fornecedorRepository.deleteAll();
 		Fornecedor fornecedor = new Fornecedor("Campo florido", "93867462000191",
 				new Endereco("41290221", "Rua Guia Lopes 225", "CASA", "Centro", "Agulha", "SP"));
 		fornecedorRepository.save(fornecedor);
+		
+		Usuario usuario = new Usuario(login, senhaCriptografada);
+		Perfil perfilADM = new Perfil("ROLE_ADMIN");
+		usuario.adicionarPerfil(perfilADM);
+		
+		usuarioRepository.save(usuario);
 		TestTransaction.end();
 	}
 
@@ -82,9 +108,14 @@ public class FornecedorIntegrationTest {
 		TestTransaction.start();
 		TestTransaction.flagForCommit();
 		fornecedorRepository.deleteAll();
+		usuarioRepository.deleteAll();
 		TestTransaction.end();
 	}
 
+	private String getHost() {
+		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api").toUriString();
+	}
+	
 	private String getURI() {
 		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/fornecedores").toUriString();
 	}
@@ -104,8 +135,11 @@ public class FornecedorIntegrationTest {
 	 */
 
 	@Test
-	void deveListarFornecedores() {
+	void deveListarFornecedores() throws JsonProcessingException {
 
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
+		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<List<Fornecedor>> response = testRestTemplate.exchange(getURI(), HttpMethod.GET, entity,
 				new ParameterizedTypeReference<List<Fornecedor>>() {
@@ -122,6 +156,9 @@ public class FornecedorIntegrationTest {
 	@Test
 	void deveCadastrarFornecedor() throws JsonProcessingException {
 
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
+		
 		FornecedorForm form = new FornecedorForm("Campo agreste", "93657487000291", new EnderecoForm("41290221"));
 
 		HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(form), headers);

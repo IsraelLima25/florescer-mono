@@ -1,6 +1,7 @@
 package br.com.loja.florescer.controller;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -9,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -100,6 +101,7 @@ public class PedidoControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void deveCriarPedidoRetornar200() throws Exception {
 		
 		PedidoForm form = new PedidoForm("05489745693", new EnderecoForm("41654789"), TipoFormaPagamentoIndicador.PIX, 
@@ -107,7 +109,7 @@ public class PedidoControllerTest {
 		
 		Mockito.when(pedidoService.criarPedido(form)).thenReturn(pedido);
 		
-		mockMvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/pedidos").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(form)))
 		.andDo(print())
 		.andExpect(jsonPath("$.cpfCliente", is("05489745693")))
@@ -115,6 +117,7 @@ public class PedidoControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void deveBuscarPedidoPorCpfClienteRetornar200() throws Exception {
 		
 		Mockito.when(pedidoRepository.findByClienteCpf("05489745693")).thenReturn(Optional.of(List.of(pedido)));
@@ -127,6 +130,7 @@ public class PedidoControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void naoDeveBuscarPedidoPorCpfClienteInvalidoRetornar404() throws Exception {
 		
 		Mockito.when(pedidoRepository.findByClienteCpf("05489400300")).thenReturn(Optional.of(List.of()));
@@ -137,20 +141,22 @@ public class PedidoControllerTest {
 	}
 	
 	@Test
+	@WithMockUser
 	void deveCancelarPedidoPorCpfClienteRetornar200() throws Exception {
 		
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
-		mockMvc.perform(post("/api/pedidos/cancelar/{idPedido}", 2).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(post("/api/pedidos/cancelar/{idPedido}", 2).with(csrf()).contentType(MediaType.APPLICATION_JSON))
 		.andDo(print())
 		.andExpect(status().isNotFound());
 	}
 	
 	@Test
+	@WithMockUser
 	void naoDeveCancelarPedidoPorCpfClienteInvalidoRetornar404() throws Exception {
 		
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
 		
-		mockMvc.perform(post("/api/pedidos/cancelar/{idPedido}", 1).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(post("/api/pedidos/cancelar/{idPedido}", 1).with(csrf()).contentType(MediaType.APPLICATION_JSON))
 		.andDo(print())
 		.andExpect(status().isOk());
 	}

@@ -15,9 +15,11 @@ import br.com.loja.florescer.exception.NotFoundException;
 import br.com.loja.florescer.model.Pedido;
 import br.com.loja.florescer.repository.PedidoRepository;
 import br.com.loja.florescer.service.PagamentoService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/pagamentos")
+@SecurityRequirement(name = "bearer-key")
 public class PagamentoController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PagamentoController.class);

@@ -21,10 +21,12 @@ import br.com.loja.florescer.model.Fornecedor;
 import br.com.loja.florescer.repository.FornecedorRepository;
 import br.com.loja.florescer.view.EnderecoView;
 import br.com.loja.florescer.view.FornecedorView;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/fornecedores")
+@SecurityRequirement(name = "bearer-key")
 public class FornecedorController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FornecedorController.class);

@@ -20,11 +20,13 @@ import br.com.loja.florescer.model.Pedido;
 import br.com.loja.florescer.repository.PedidoRepository;
 import br.com.loja.florescer.view.EntregaView;
 import br.com.loja.florescer.view.StatusEntregaView;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/entregas")
+@SecurityRequirement(name = "bearer-key")
 public class EntregaController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntregaController.class);

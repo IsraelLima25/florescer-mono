@@ -1,6 +1,7 @@
 package br.com.loja.florescer.controller;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -83,6 +85,7 @@ public class EntregaControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void deveMostrarStatusRetornar200() throws Exception {
 
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
@@ -93,6 +96,7 @@ public class EntregaControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void naoDeveMostrarStatusPedidoInvalidoRetornar404() throws Exception {
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
 		mockMvc.perform(get("/api/entregas/pedido/{idPedido}", 2L).contentType(MediaType.APPLICATION_JSON)).andDo(print())
@@ -100,11 +104,12 @@ public class EntregaControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void deveAvaliarRetornar200() throws Exception {
 		
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
 		AvaliacaoEntregaForm form = new AvaliacaoEntregaForm(1L, AvaliacaoIndicador.THREE_STAR);
-		mockMvc.perform(post("/api/entregas/avaliar").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/entregas/avaliar").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(form))).andDo(print())
 				.andExpect(jsonPath("$.status", is(StatusEntregaIndicador.AGUARDANDO_CONFIRMACAO_DE_PAGAMENTO.toString())))
 				.andExpect(jsonPath("$.avaliacao", is(AvaliacaoIndicador.THREE_STAR.toString())))
@@ -112,10 +117,11 @@ public class EntregaControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void naoDeveAvaliarPedidoInvalidoRetornar404() throws Exception {
 		Mockito.when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
 		AvaliacaoEntregaForm form = new AvaliacaoEntregaForm(2L, AvaliacaoIndicador.THREE_STAR);
-		mockMvc.perform(post("/api/entregas/avaliar").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/entregas/avaliar").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(form))).andDo(print())
 				.andExpect(status().isNotFound());
 	}

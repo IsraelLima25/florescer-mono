@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,9 +33,13 @@ import br.com.loja.florescer.view.ProdutoView;
 import br.com.loja.florescer.form.ProdutoForm;
 import br.com.loja.florescer.model.Endereco;
 import br.com.loja.florescer.model.Produto;
+import br.com.loja.florescer.model.Usuario;
 import br.com.loja.florescer.model.Fornecedor;
+import br.com.loja.florescer.model.Perfil;
 import br.com.loja.florescer.repository.FornecedorRepository;
 import br.com.loja.florescer.repository.ProdutoRepository;
+import br.com.loja.florescer.repository.UsuarioRepository;
+import br.com.loja.florescer.security.LoginService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -65,6 +70,21 @@ public class ProdutoIntegrationTest {
 	@Autowired
 	FornecedorRepository fornecedorRepository;
 	
+	@Autowired
+	UsuarioRepository usuarioRepository;
+	
+	@Value("${user.login}")
+	String login;
+	
+	@Value("${user.password.criptografada}")
+	String senhaCriptografada;
+	
+	@Value("${user.password.descriptografada}")
+	String senhaDescriptografada;
+	
+	@Autowired
+	LoginService loginService;
+	
 	private static HttpHeaders headers;
 	
 	@BeforeAll
@@ -81,6 +101,7 @@ public class ProdutoIntegrationTest {
 		
 		produtoRepository.deleteAll();
 		fornecedorRepository.deleteAll();
+		usuarioRepository.deleteAll();
 		
 		
 		Endereco enderecoFornecedorEstadual = new Endereco("41290221", "Rua dos testes fornecedor estadual", "Casa", "Moca", "São Paulo",
@@ -93,6 +114,11 @@ public class ProdutoIntegrationTest {
 		Produto segundoProduto = new Produto("Margarida", new BigDecimal("7.00"), 16, "sp", fornecedorEstadual);
 		
 		produtoRepository.saveAll(List.of(primeiroProduto, segundoProduto));
+		
+		Usuario usuario = new Usuario(login, senhaCriptografada);
+		Perfil perfilADM = new Perfil("ROLE_ADMIN");
+		usuario.adicionarPerfil(perfilADM);
+		usuarioRepository.save(usuario);
 		TestTransaction.end();
 	}
 	
@@ -103,7 +129,12 @@ public class ProdutoIntegrationTest {
 		TestTransaction.flagForCommit();
 		produtoRepository.deleteAll();
 		fornecedorRepository.deleteAll();
+		usuarioRepository.deleteAll();
 		TestTransaction.end();
+	}
+	
+	private String getHost() {
+		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api").toUriString();
 	}
 	
 	private String getURI() {
@@ -112,7 +143,10 @@ public class ProdutoIntegrationTest {
 
 	
 	@Test
-	void deveListarTodosProdutos() { 
+	void deveListarTodosProdutos() throws JsonProcessingException { 
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<List<ProdutoView>> response = testRestTemplate.exchange(getURI(), 
@@ -132,6 +166,9 @@ public class ProdutoIntegrationTest {
 	@Test
 	void deveCadastrarProduto() throws JsonProcessingException {
 		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
+		
 		ProdutoForm form = new ProdutoForm("Kit cafe da manha", new BigDecimal("30.00"),20,"ba",1L);
 		
 		HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(form), headers);
@@ -150,6 +187,9 @@ public class ProdutoIntegrationTest {
 	
 	@Test
 	void naoDeveCadastrarProdutoComFornecedorInvalido() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		ProdutoForm form = new ProdutoForm("Kit cafe da manha", new BigDecimal("30.00"),20,"ba",30L);
 		

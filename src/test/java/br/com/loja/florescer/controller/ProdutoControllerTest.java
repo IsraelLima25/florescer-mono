@@ -1,6 +1,7 @@
 package br.com.loja.florescer.controller;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -62,6 +64,7 @@ public class ProdutoControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void deveListarProdutosRetornar200() throws Exception {
 
 		Mockito.when(produtoRepository.findAll()).thenReturn(List.of(produto));
@@ -72,25 +75,27 @@ public class ProdutoControllerTest {
 	}
 
 	@Test
+	@WithMockUser
 	void deveCadastrarProdutoRetornar200() throws Exception {
 
 		Mockito.when(fornecedorRepository.findById(1L)).thenReturn(Optional.of(fornecedor));
 
 		ProdutoForm form = new ProdutoForm("Rosa", new BigDecimal("7.00"), 15, "sp", 1L);
 
-		mockMvc.perform(post("/api/produtos").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/produtos").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(form))).andDo(print())
 				.andExpect(jsonPath("$.descricao", is("Rosa"))).andExpect(status().isOk());
 	}
 
 	@Test
+	@WithMockUser
 	void naoDeveCadastrarProdutoFornecedorInvalidoRetornar404() throws Exception {
 
 		Mockito.when(fornecedorRepository.findById(1L)).thenReturn(Optional.of(fornecedor));
 
 		ProdutoForm form = new ProdutoForm("Rosa", new BigDecimal("7.00"), 15, "sp", 2L);
 
-		mockMvc.perform(post("/api/produtos").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/produtos").with(csrf()).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(form))).andDo(print()).andExpect(status().isNotFound());
 	}
 

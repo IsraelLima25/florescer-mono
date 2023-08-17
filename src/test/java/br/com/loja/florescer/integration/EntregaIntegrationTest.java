@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,13 +34,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.loja.florescer.model.Pedido;
+import br.com.loja.florescer.model.Perfil;
 import br.com.loja.florescer.model.Produto;
+import br.com.loja.florescer.model.Usuario;
 import br.com.loja.florescer.repository.ClienteRepository;
 import br.com.loja.florescer.repository.EntregaRepository;
 import br.com.loja.florescer.repository.FornecedorRepository;
 import br.com.loja.florescer.repository.ItemPedidoRepository;
 import br.com.loja.florescer.repository.PedidoRepository;
 import br.com.loja.florescer.repository.ProdutoRepository;
+import br.com.loja.florescer.repository.UsuarioRepository;
+import br.com.loja.florescer.security.LoginService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import br.com.loja.florescer.form.AvaliacaoEntregaForm;
@@ -92,6 +97,21 @@ public class EntregaIntegrationTest {
 	@Autowired
 	EntregaRepository entregaRepository;
 	
+	@Autowired
+	UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	LoginService loginService;
+	
+	@Value("${user.login}")
+	String login;
+	
+	@Value("${user.password.criptografada}")
+	String senhaCriptografada;
+	
+	@Value("${user.password.descriptografada}")
+	String senhaDescriptografada;
+	
 	private static HttpHeaders headers;
 
 	@BeforeAll
@@ -104,6 +124,7 @@ public class EntregaIntegrationTest {
 	void init() {
 		resetIncrement();
 		TestTransaction.flagForCommit(); // need this, otherwise the next line does a rollback
+		usuarioRepository.deleteAll();
 		itemPedidoRepository.deleteAll();
 		pedidoRepository.deleteAll();
 		produtoRepository.deleteAll();
@@ -156,6 +177,15 @@ public class EntregaIntegrationTest {
 		pedido.adicionarFormaPagamento(pagamento);
 
 		pedidoRepository.save(pedido);
+		
+		usuarioRepository.deleteAll();
+		
+		Usuario usuario = new Usuario(login, senhaCriptografada);
+		Perfil perfilADM = new Perfil("ROLE_ADMIN");
+		usuario.adicionarPerfil(perfilADM);
+		
+		usuarioRepository.save(usuario);
+		
 		TestTransaction.end();
 
 	}
@@ -171,16 +201,23 @@ public class EntregaIntegrationTest {
 		fornecedorRepository.deleteAll();
 		clienteRepository.deleteAll();
 		entregaRepository.deleteAll();
-		
+		usuarioRepository.deleteAll();
 		TestTransaction.end();
 	}
 
+	private String getHost() {
+		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api").toUriString();
+	}
+	
 	private String getURI() {
 		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/entregas").toUriString();
 	}
 
 	@Test
-	void deveRetornarStatusEntregaPedidoValido() {
+	void deveRetornarStatusEntregaPedidoValido() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
 		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<StatusEntregaView> response = testRestTemplate.exchange(getURI().concat("/pedido/1"), 
@@ -196,7 +233,11 @@ public class EntregaIntegrationTest {
 	}
 	
 	@Test
-	void naoDeveRetornarStatusEntregaPedidoInvalido() {
+	void naoDeveRetornarStatusEntregaPedidoInvalido() throws JsonProcessingException{
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
+		
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 		ResponseEntity<StatusEntregaView> response = testRestTemplate.exchange(getURI().concat("/pedido/100"), 
 				HttpMethod.GET, entity,
@@ -209,6 +250,10 @@ public class EntregaIntegrationTest {
 	
 	@Test
 	void deveAvaliarEntregaPedidoValido() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
+		
 		AvaliacaoEntregaForm form = new AvaliacaoEntregaForm(1L, AvaliacaoIndicador.FIVE_STAR);
 		HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(form), headers);
 		ResponseEntity<EntregaView> response = testRestTemplate.exchange(getURI().concat("/avaliar"), 
@@ -224,6 +269,10 @@ public class EntregaIntegrationTest {
 	
 	@Test
 	void naoDeveAvaliarEntregaPedidoInvalido() throws JsonProcessingException {
+		
+		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
+		headers.add("Authorization", token);
+		
 		AvaliacaoEntregaForm form = new AvaliacaoEntregaForm(100L, AvaliacaoIndicador.FIVE_STAR);
 		HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(form), headers);
 		ResponseEntity<EntregaView> response = testRestTemplate.exchange(getURI().concat("/avaliar"), 

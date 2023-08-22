@@ -97,6 +97,7 @@ public class ClienteIntegrationTest {
 		resetIncrement();
 		TestTransaction.flagForCommit();
 		usuarioRepository.deleteAll();
+		clienteRepository.deleteAll();
 		
 		Usuario usuario = new Usuario(login, senhaCriptografada);
 		Perfil perfilADM = new Perfil("ROLE_ADMIN");

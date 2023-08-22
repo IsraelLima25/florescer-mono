@@ -1,0 +1,108 @@
+CREATE TABLE tbl_endereco(
+id BIGINT AUTO_INCREMENT,
+cep VARCHAR(12) NOT NULL,
+logradouro VARCHAR(50) NOT NULL,
+complemento VARCHAR(30) NULL,
+bairro VARCHAR(30) NOT NULL,
+localidade VARCHAR(30) NOT NULL,
+uf varchar(2) NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_cliente(
+id BIGINT AUTO_INCREMENT,
+nome VARCHAR(50) NOT NULL,
+cpf VARCHAR(11) NOT NULL,
+rg VARCHAR(15) NOT NULL,
+data_nascimento DATE NOT NULL,
+id_endereco BIGINT NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_fornecedor(
+id BIGINT AUTO_INCREMENT,
+nome VARCHAR(100) NOT NULL,
+cnpj VARCHAR(14) NOT NULL,
+id_endereco BIGINT NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_produto(
+id BIGINT AUTO_INCREMENT,
+descricao VARCHAR(100) NOT NULL,
+preco DECIMAL(8,2) NOT NULL,
+quantidade_estoque MEDIUMINT NOT NULL,
+sigla_filial VARCHAR(2) NOT NULL,
+id_fornecedor BIGINT NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_pedido(
+id BIGINT AUTO_INCREMENT,
+data_hora_local DATETIME NOT NULL,
+preco_total_itens DECIMAL(8,2) NOT NULL,
+preco_total_pagamento DECIMAL(8,2) NOT NULL,
+status VARCHAR(30) NOT NULL,
+id_cliente BIGINT NOT NULL,
+id_pagamento BIGINT NULL,
+id_entrega BIGINT NULL,
+observacao TEXT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_pedido_produto(
+id BIGINT AUTO_INCREMENT,
+id_pedido BIGINT NOT NULL,
+id_produto BIGINT NOT NULL,
+quantidade BIGINT NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_pagamento(
+id BIGINT AUTO_INCREMENT,
+data_hora_local DATETIME NOT NULL,
+preco_total DECIMAL(8,2) NOT NULL,
+forma_pagamento VARCHAR(30) NOT NULL,
+status VARCHAR(30) NOT NULL,
+observacao TEXT NULL,
+PRIMARY KEY(id)
+);
+
+
+CREATE TABLE tbl_entrega(
+id BIGINT AUTO_INCREMENT,
+status VARCHAR(50) NOT NULL,
+avaliacao_estrela VARCHAR(30) NULL,
+preco DECIMAL(6,2) NOT NULL,
+id_endereco BIGINT NOT NULL,
+observacao TEXT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_reserva_estoque(
+id BIGINT AUTO_INCREMENT,
+id_produto BIGINT NOT NULL,
+id_pedido BIGINT NOT NULL,
+quantidade BIGINT NOT NULL, 
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_usuario(
+id BIGINT NOT NULL AUTO_INCREMENT,
+login VARCHAR(100) NOT NULL,
+senha VARCHAR(255) NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_perfil(
+id BIGINT NOT NULL AUTO_INCREMENT,
+descricao VARCHAR(30) NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE tbl_usuario_perfil(
+id BIGINT AUTO_INCREMENT,
+id_usuario BIGINT NOT NULL,
+id_perfil BIGINT NOT NULL,
+PRIMARY KEY(id)
+);

@@ -1,0 +1,51 @@
+version: '3.8'
+
+networks:
+  florescer:
+    internal:
+      false
+
+services:
+  
+  db-mysql:
+    image: mysql:8.0.33
+    container_name: db-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: admin      
+      MYSQL_USER: ilima
+      MYSQL_PASSWORD: user
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    networks:
+      - florescer
+      
+  api-florescer:
+    build:
+     context: .
+     dockerfile: Dockerfile-DEV
+    image: ilimafilho/florescer:1.0.0
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: db-mysql:3306
+    ports:
+      - 8080:8080
+    depends_on:
+      - db-mysql  
+    networks:
+      - florescer  
+  
+  #rabbitmq:
+    #image: rabbitmq:3.10-management
+    #container_name: rabbitmq
+    #restart: unless-stopped
+    #ports:
+      #- 5672:5672
+      #- 15672:15672
+    #volumes:
+      #- ./dados:/var/lib/rabbitmq/
+    #environment:
+      #- RABBITMQ_DEFAULT_USER=ilima
+      #- RABBITMQ_DEFAULT_PASS=admin      

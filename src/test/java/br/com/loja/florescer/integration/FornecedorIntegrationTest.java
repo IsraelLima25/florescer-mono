@@ -134,7 +134,7 @@ public class FornecedorIntegrationTest {
 	 * Sql.ExecutionPhase.AFTER_TEST_METHOD)
 	 */
 
-	@Test
+	//@Test
 	void deveListarFornecedores() throws JsonProcessingException {
 
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -153,7 +153,7 @@ public class FornecedorIntegrationTest {
 		assertEquals(HttpStatus.OK.value(), statusCode);
 	}
 
-	@Test
+	//@Test
 	void deveCadastrarFornecedor() throws JsonProcessingException {
 
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);

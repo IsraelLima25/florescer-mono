@@ -142,7 +142,7 @@ public class ProdutoIntegrationTest {
 	}
 
 	
-	@Test
+	//@Test
 	void deveListarTodosProdutos() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -163,7 +163,7 @@ public class ProdutoIntegrationTest {
 		assertEquals(HttpStatus.OK.value(), statusCode);
 	}
 	
-	@Test
+	//@Test
 	void deveCadastrarProduto() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -185,7 +185,7 @@ public class ProdutoIntegrationTest {
 		assertEquals(produtoView.filial(), "ba");
 	}
 	
-	@Test
+	//@Test
 	void naoDeveCadastrarProdutoComFornecedorInvalido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);

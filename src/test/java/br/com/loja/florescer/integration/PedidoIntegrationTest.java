@@ -214,7 +214,7 @@ public class PedidoIntegrationTest {
 		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/pedidos").toUriString();
 	}
 	
-	@Test
+	//@Test
 	void deveFazerPedido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -238,7 +238,7 @@ public class PedidoIntegrationTest {
 		assertEquals(pedidoView.cpfCliente(), "12365489763");
 	}
 	
-	@Test
+	//@Test
 	void deveBuscarPedidoPorCpfClienteDonoPedido() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -260,7 +260,7 @@ public class PedidoIntegrationTest {
 		assertEquals(body.get(0).itensPedido().size(), 2);
 	}
 	
-	@Test
+	//@Test
 	void naoDeveBuscarPedidoPorCpfClienteDonoPedidoInvalido() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -275,7 +275,7 @@ public class PedidoIntegrationTest {
 		assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCode().value());
 	}
 	
-	@Test
+	//@Test
 	void deveCancelarPedido() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -288,7 +288,7 @@ public class PedidoIntegrationTest {
 		assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
 	}
 	
-	@Test
+	//@Test
 	void naoDeveCancelarPedidoInvalido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);

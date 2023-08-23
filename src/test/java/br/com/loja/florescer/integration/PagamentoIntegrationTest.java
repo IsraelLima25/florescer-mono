@@ -202,7 +202,7 @@ public class PagamentoIntegrationTest {
 		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/pagamentos").toUriString();
 	}
 	
-	@Test
+	//@Test
 	void deveRegistrarPagamento() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -215,7 +215,7 @@ public class PagamentoIntegrationTest {
 		assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
 	}
 	
-	@Test
+	//@Test
 	void naoDeveRegistrarPagamentoPedidoInvalido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);

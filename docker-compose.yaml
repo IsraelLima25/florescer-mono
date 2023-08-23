@@ -1,10 +1,5 @@
 version: '3.8'
 
-networks:
-  florescer:
-    internal:
-      false
-
 services:
   
   db-mysql:
@@ -21,21 +16,37 @@ services:
       - 3306:3306
     networks:
       - florescer
-      
-  api-florescer:
-    build:
-     context: .
-     dockerfile: Dockerfile-DEV
-    image: ilimafilho/florescer:1.0.0
-    restart: unless-stopped
-    environment:
-      MYSQL_HOST: db-mysql:3306
+  
+  jenkins:
+    image: jenkins/jenkins:2.414.1-lts-jdk17
+    container_name: jenkins
     ports:
-      - 8080:8080
-    depends_on:
-      - db-mysql  
-    networks:
-      - florescer  
+      - 9090:8080
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+volumes:
+  jenkins_home:
+
+networks:
+  florescer:
+    internal:
+      false
+      
+  #api-florescer:
+    #build:
+     #context: .
+     #dockerfile: Dockerfile-DEV
+    #image: ilimafilho/florescer:1.0.0
+    #restart: unless-stopped
+    #environment:
+      #MYSQL_HOST: db-mysql:3306
+    #ports:
+      #- 8080:8080
+    #depends_on:
+      #- db-mysql  
+    #networks:
+      #- florescer  
   
   #rabbitmq:
     #image: rabbitmq:3.10-management

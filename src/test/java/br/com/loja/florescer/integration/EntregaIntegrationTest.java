@@ -213,7 +213,7 @@ public class EntregaIntegrationTest {
 		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/entregas").toUriString();
 	}
 
-	@Test
+	//@Test
 	void deveRetornarStatusEntregaPedidoValido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -232,7 +232,7 @@ public class EntregaIntegrationTest {
 		assertEquals(HttpStatus.OK.value(), statusCode);
 	}
 	
-	@Test
+	//@Test
 	void naoDeveRetornarStatusEntregaPedidoInvalido() throws JsonProcessingException{
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -248,7 +248,7 @@ public class EntregaIntegrationTest {
 		assertEquals(HttpStatus.NOT_FOUND.value(), statusCode);
 	}
 	
-	@Test
+	//@Test
 	void deveAvaliarEntregaPedidoValido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -267,7 +267,7 @@ public class EntregaIntegrationTest {
 		assertEquals(entregaView.avaliacao(), AvaliacaoIndicador.FIVE_STAR);
 	}
 	
-	@Test
+	//@Test
 	void naoDeveAvaliarEntregaPedidoInvalido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);

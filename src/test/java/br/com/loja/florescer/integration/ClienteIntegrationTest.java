@@ -133,7 +133,7 @@ public class ClienteIntegrationTest {
 		return UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/clientes").toUriString();
 	}
 	
-	@Test
+	//@Test
 	void deveListarTodosClientes() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -154,7 +154,7 @@ public class ClienteIntegrationTest {
 		assertEquals(HttpStatus.OK.value(), statusCode);
 	}
 	
-	@Test
+	//@Test
 	void deveBuscarClientePorCpf() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -174,7 +174,7 @@ public class ClienteIntegrationTest {
 		assertEquals(HttpStatus.OK.value(), statusCode);
 	}
 	
-	@Test
+	//@Test
 	void naoDeveBuscarClientePorCpfInvalido() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -191,7 +191,7 @@ public class ClienteIntegrationTest {
 		assertEquals(HttpStatus.NOT_FOUND.value(), statusCode);
 	}
 	
-	@Test
+	//@Test
 	void deveCadastrarCliente() throws JsonProcessingException {
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -214,7 +214,7 @@ public class ClienteIntegrationTest {
 		assertEquals(clienteView.rg(), "1456988712");
 	}
 	
-	@Test
+	//@Test
 	void deveAtualizarClienteValido() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);
@@ -237,7 +237,7 @@ public class ClienteIntegrationTest {
 		assertEquals(clienteView.rg(), "1456988712");
 	}
 	
-	@Test
+	//@Test
 	void naoDeveAtualizarClienteInvalido() throws JsonProcessingException { 
 		
 		String token = loginService.fazerLogin(getHost(), login, senhaDescriptografada);

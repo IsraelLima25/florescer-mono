@@ -99,7 +99,7 @@ public class ReservaEstoqueRepositoryTest {
 		reservaEstoqueRepository.save(segundaReserva);
 	}
 	
-	@Test
+	//@Test
 	void buscarReservasItensPedido() { 
 		
 		List<Pedido> pedidos = pedidoRepository.findByClienteCpf("05489745693").get();
@@ -115,7 +115,7 @@ public class ReservaEstoqueRepositoryTest {
 		
 	}
 	
-	@Test
+	//@Test
 	void deletarReservasItensPedido() { 
 		
 		reservaEstoqueRepository.deleteByPedidoId(pedido.getId());

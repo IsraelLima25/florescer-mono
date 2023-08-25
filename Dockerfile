@@ -4,7 +4,7 @@ RUN apt-get install maven -y
 RUN apt-get install openjdk-17-jre -y
 COPY . /app
 WORKDIR /app
-RUN mkdir target
+RUN mkdir /app/target
 CMD [ "mvn", "clean", "package" ]
 COPY target/*.jar /app/app.jar
 EXPOSE 8080

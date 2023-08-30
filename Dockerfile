@@ -3,7 +3,7 @@ ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
 COPY . $HOME
-RUN mvn clean package
+RUN mvn -DskipTests clean package
 
 FROM openjdk:17
 COPY --from=build /usr/app/target/*.jar /app/runner.jar

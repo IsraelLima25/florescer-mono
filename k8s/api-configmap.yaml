@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: api-configmap
 data:
-  MYSQL_HOST: 10.1.0.28:3306
+  MYSQL_HOST: 172.18.0.2:3306

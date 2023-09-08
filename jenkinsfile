@@ -1,0 +1,125 @@
+pipeline {
+    
+    agent any
+    
+    stages{
+        
+        stage('Clone repository'){
+            steps{
+                git url: 'git@github.com:IsraelLima25/florescer-mono.git',
+                credentialsId: 'github',
+                branch: 'main'
+            }
+        }    
+        
+        stage('Run test'){
+            steps{
+                script {
+                    try {
+                        sh 'mvn test'
+                    } catch (Exception e) {
+                        sh "echo $e"
+                        slackSend (color: 'error', message: "[ FALHA ] Não foi possivel subir o container - ${BUILD_URL} em ${currentBuild.duration}s", tokenCredentialId: 'slack')
+                        sh "echo $e"
+                        currentBuild.result = 'ABORTED'
+                        error('Erro')
+                    }    
+                }
+            }   
+        }
+        stage('Sonar scanner'){
+                steps{
+                    script {
+                        try {
+                            sh 'echo Rodando sonar'
+                            sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=florescer-api -Dsonar.projectName=florescer-api -Dsonar.host.url=http://192.168.100.12:9000 -Dsonar.token=sqp_20a91c7d846c483677e9384f674cc4db21ed4136'
+                        } catch (Exception e) {
+                            sh "echo $e"
+                            slackSend (color: 'error', message: "[ FALHA ] Não foi possivel subir o container - ${BUILD_URL} em ${currentBuild.duration}s", tokenCredentialId: 'slack')
+                            sh "echo $e"
+                            currentBuild.result = 'ABORTED'
+                            error('Erro')
+                        }
+                    }
+                }
+        }
+            
+        
+        stage('Analyze dockerfile'){
+            steps{
+                script {
+                    try {
+                        sh 'echo Analisando dockerfile'
+                        sh 'docker run --rm -i hadolint/hadolint < Dockerfile'
+                    } catch (Exception e) {
+                        sh "echo $e"
+                        slackSend (color: 'error', message: "[ FALHA ] Não foi possivel subir o container - ${BUILD_URL} em ${currentBuild.duration}s", tokenCredentialId: 'slack')
+                        sh "echo $e"
+                        currentBuild.result = 'ABORTED'
+                        error('Erro')
+                    }
+                }
+            }
+        }
+        
+        stage('Build image'){
+            steps{
+                script {
+                    try {
+                        sh 'echo Construindo imagem'
+                        sh 'docker build -t ilimafilho/florescer:1.0.0 .'
+                    } catch (Exception e) {
+                        sh "echo $e"
+                        slackSend (color: 'error', message: "[ FALHA ] Não foi possivel subir o container - ${BUILD_URL} em ${currentBuild.duration}s", tokenCredentialId: 'slack')
+                        sh "echo $e"
+                        currentBuild.result = 'ABORTED'
+                        error('Erro')
+                    }
+                }
+            }
+        }
+        
+        stage('Push image'){
+            steps{
+                script{
+                    try {
+                        sh 'echo Enviando imagem para repositorio remoto'
+                        withDockerRegistry([ credentialsId: "dockerhub", url: "" ]) {
+                        sh 'docker push ilimafilho/florescer:1.0.0'
+                        sh 'echo Removendo cache imagem local'
+                        sh 'docker image rm ilimafilho/florescer'
+                    }
+                    } catch (Exception e) {
+                        sh "echo $e"
+                    }
+                }
+            }
+        }
+      
+        stage('Deploy'){
+            steps{
+                script {
+                    sh 'echo Fazendo deploy no cluster'
+                    try {
+                        withKubeConfig([credentialsId: 'kubernetes_minikube', serverUrl: '']) {
+                            sh 'kubectl apply -f ./k8s/api-configmap.yaml'
+                            sh 'kubectl apply -f ./k8s/api-service.yaml'
+                            sh 'kubectl apply -f ./k8s/api-deployment.yaml'
+                    }
+                    } catch (Exception e) {
+                        sh "echo $e"
+                        slackSend (color: 'error', message: "[ FALHA ] Não foi possivel subir o container - ${BUILD_URL} em ${currentBuild.duration}s", tokenCredentialId: 'slack')
+                        sh "echo $e"
+                        currentBuild.result = 'ABORTED'
+                        error('Erro')
+                    }
+                }
+            }
+        }
+        stage('Notifying user') {
+            steps {
+                slackSend (color: 'good', message: '[ Sucesso ] O novo build esta disponivel em: http://127.0.0.1:3000/ ', tokenCredentialId: 'slack')
+            }
+        }
+    }
+}
